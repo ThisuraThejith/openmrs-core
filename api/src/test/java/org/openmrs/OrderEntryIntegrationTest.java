@@ -38,6 +38,7 @@ import org.openmrs.api.ProviderService;
 import org.openmrs.api.context.Context;
 import org.openmrs.order.OrderUtilTest;
 import org.openmrs.test.BaseContextSensitiveTest;
+import org.openmrs.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -296,7 +297,7 @@ public class OrderEntryIntegrationTest extends BaseContextSensitiveTest {
 		assertFalse(encounter.getOrders().isEmpty());
 		encounter.getOrders().iterator().next().setInstructions("new");
 		expectedException.expect(APIException.class);
-		expectedException.expectMessage(Matchers.is("editing.fields.not.allowed"));
+		expectedException.expectMessage(Matchers.is(Context.getMessageSourceService().getMessage("editing.fields.not.allowed", new Object[] { Order.class.getSimpleName() }, null)));
 		encounterService.saveEncounter(encounter);
 		Context.flushSession();
 	}
@@ -365,8 +366,9 @@ public class OrderEntryIntegrationTest extends BaseContextSensitiveTest {
 		cal.add(Calendar.HOUR_OF_DAY, -1);
 		Date stopDate = cal.getTime();
 		Order dcOrder = orderService.discontinueOrder(order, "Testing", stopDate, order.getOrderer(), order.getEncounter());
-		assertEquals(stopDate, order.getDateStopped());
-		assertEquals(stopDate, dcOrder.getAutoExpireDate());
+		Context.flushSession(); // ensures that order is flushed and that the drop milliseconds interceptor is called
+		assertEquals(DateUtil.truncateToSeconds(stopDate), order.getDateStopped());
+		assertEquals(DateUtil.truncateToSeconds(stopDate), dcOrder.getAutoExpireDate());
 	}
 
 	@Test

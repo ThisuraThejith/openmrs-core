@@ -41,6 +41,7 @@
 		<connection>scm:git:git@github.com:openmrs/openmrs-core</connection>
 		<developerConnection>scm:git:git@github.com:openmrs/openmrs-core</developerConnection>
 		<url>https://github.com/openmrs/openmrs-core</url>
+		<tag>HEAD</tag>
 	</scm>
 
 	<ciManagement>
